@@ -152,8 +152,8 @@ double roott(double num, int rootDegree) {
   return root;
 }
 
-mixin WhichMailSystem {
-  getMailSystem(String email) {
+mixin WhichMailSystem on User {
+  getMailSystem() {
     int ind = email.indexOf('@');
     dynamic mailsystem = '';
     for (var i = ind + 1; i < email.length; i++) {
@@ -163,7 +163,7 @@ mixin WhichMailSystem {
   }
 }
 
-abstract class User with WhichMailSystem {
+abstract class User {
   late String name;
   late String email;
 }
@@ -176,36 +176,38 @@ class GeneralUser extends User {
   GeneralUser(name, email);
 }
 
-class UserManager<T extends User> with WhichMailSystem {
-  Map<String, String> users = {
-    "Sonya": "sonyak0t@mail.ru",
-    "Fedya": "f-maslov@bk.ru",
-    "Voopoo": "imrabit@wild.com"
-  };
+class UserManager<T extends User> {
+  List<User> users = [
+    GeneralUser("Sonya", "sonyak0t@mail.ru"),
+    AdminUser("Fedya", "f-maslov@bk.ru"),
+    GeneralUser("Voopoo", "imrabit@wild.com")
+  ];
   Map<String, String> admins = {};
-  adduser(String name, String mail) {
-    users[name] = mail;
-  }
-
-  addadmin(String name, String mail) {
-    users[name] = mail;
-    admins[name] = mail;
+  void addUser(User user) {
+    users.add(user);
   }
 
   deleteuser(String name) {
-    if (users.containsKey(name)) {
-      users.remove(name);
-    } else {
-      print('Пользователь $name не существует');
+    int count = 0;
+    for (var el in users) {
+      if (el == name) {
+        users.remove(name);
+        print('Пользователь $name удален');
+        count = 1;
+        break;
+      }
+    }
+    if (count == 0) {
+      print('Пользователь с таким именем не существует.');
     }
   }
 
   void showallemails() {
-    for (var value in users.values) {
-      if (admins.containsValue(value)) {
-        print(getMailSystem(value));
+    for (var user in users) {
+      if (user is AdminUser) {
+        print(user.getMailSystem());
       } else {
-        print(value);
+        print(user.email);
       }
     }
   }
@@ -258,8 +260,6 @@ void main() {
       "Седьмое задание: Корень из числа num(125) в степени n(3) = ${roott(125, 3)}");
   print(
       'Восьмое задание: Добавить обычного ползователя Ulan c почтой poznaks@mail.ru, добавить админа Owner с почтой maxpayne@gmail.com, удалить пользователя Fedya, вывести все почты с исключением для админов');
-  man.adduser('Ulan', 'poznaks@mail.ru');
-  man.addadmin('Owner', 'maxpayne@gmail.com');
-  man.deleteuser('Fedya');
+  man.deleteuser('Sonya');
   man.showallemails();
 }
