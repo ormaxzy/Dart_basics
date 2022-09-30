@@ -164,16 +164,18 @@ mixin WhichMailSystem on User {
 }
 
 abstract class User {
-  late String name;
-  late String email;
+  String name;
+  String email;
+
+  User(this.name, this.email);
 }
 
 class AdminUser extends User with WhichMailSystem {
-  AdminUser(name, email);
+  AdminUser(name, email) : super(name, email);
 }
 
 class GeneralUser extends User {
-  GeneralUser(name, email);
+  GeneralUser(name, email) : super(name, email);
 }
 
 class UserManager<T extends User> {
@@ -187,7 +189,7 @@ class UserManager<T extends User> {
     users.add(user);
   }
 
-  deleteuser(String name) {
+  deleteUser(String name) {
     int count = 0;
     for (var el in users) {
       if (el == name) {
@@ -260,6 +262,10 @@ void main() {
       "Седьмое задание: Корень из числа num(125) в степени n(3) = ${roott(125, 3)}");
   print(
       'Восьмое задание: Добавить обычного ползователя Ulan c почтой poznaks@mail.ru, добавить админа Owner с почтой maxpayne@gmail.com, удалить пользователя Fedya, вывести все почты с исключением для админов');
-  man.deleteuser('Sonya');
-  man.showallemails();
+  var userManager = UserManager();
+  User userUlan = GeneralUser('Ulan', 'poznaks@mail.ru');
+  User userYasha = AdminUser('Yasha', 'yasha@lava.com');
+  userManager.addUser(userUlan);
+  userManager.addUser(userYasha);
+  userManager.showallemails();
 }
